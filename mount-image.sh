@@ -19,11 +19,11 @@ if test -f "$OPENSUSE_RAW_FILE"; then
 fi
 
 infecho "Mounting the image to loop..."
-losetup /dev/loop0 $( basename -s .xz ${OPENSUSE_RAW_FILE})
-partprobe -s /dev/loop0
+losetup /dev/loop1 $( basename -s .xz ${OPENSUSE_RAW_FILE})
+partprobe -s /dev/loop1
 
 mkdir imgfs
-mount /dev/loop0p2 imgfs
+mount /dev/loop1p2 imgfs
 
 #FIXME: We extract rootfs partition from RAW image to convert to sparse image, so we need to edit fstab
 infecho "Change fstab to avoid EFI partition"
