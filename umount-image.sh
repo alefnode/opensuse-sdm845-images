@@ -13,8 +13,8 @@ errecho () {
 
 
 infecho "Umounting image"
-umount /dev/loop1p2 || true
-losetup -d /dev/loop1 || true
+umount /dev/loop0p2
+losetup -d /dev/loop0
 
 infecho "Deleting unused directories"
-rmdir imgfs || true
+rmdir imgfs
