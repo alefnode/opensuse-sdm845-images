@@ -16,6 +16,10 @@ infecho "Downloading image"
 
 bash download-image.sh
 
+infecho "Umount loop device"
+
+bash umount-image.sh
+
 infecho "Mounting the image"
 
 bash mount-image.sh
