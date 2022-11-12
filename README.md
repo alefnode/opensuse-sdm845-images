@@ -1,4 +1,4 @@
-# Stripts to generate IMG for SDM845 PHones
+# Stripts to generate IMG for SDM845 Phones
 
 # How to use it
 
