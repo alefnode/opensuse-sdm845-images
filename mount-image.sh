@@ -22,11 +22,11 @@ infecho "List all losetup devices"
 losetup -a
 
 infecho "Mounting the image to loop..."
-losetup /dev/loop2 $( basename -s .xz ${OPENSUSE_RAW_FILE})
-partprobe -s /dev/loop2
+losetup /dev/loop3 $( basename -s .xz ${OPENSUSE_RAW_FILE})
+partprobe -s /dev/loop3
 
 mkdir imgfs
-mount /dev/loop2p2 imgfs
+mount /dev/loop3p2 imgfs
 
 #FIXME: We extract rootfs partition from RAW image to convert to sparse image, so we need to edit fstab
 infecho "Change fstab to avoid EFI partition"
