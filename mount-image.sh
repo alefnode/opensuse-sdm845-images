@@ -18,12 +18,15 @@ if test -f "$OPENSUSE_RAW_FILE"; then
     xz -d ${OPENSUSE_RAW_FILE}
 fi
 
+infecho "List all losetup devices"
+losetup -a
+
 infecho "Mounting the image to loop..."
-losetup /dev/loop1 $( basename -s .xz ${OPENSUSE_RAW_FILE})
-partprobe -s /dev/loop1
+losetup /dev/loop2 $( basename -s .xz ${OPENSUSE_RAW_FILE})
+partprobe -s /dev/loop2
 
 mkdir imgfs
-mount /dev/loop1p2 imgfs
+mount /dev/loop2p2 imgfs
 
 #FIXME: We extract rootfs partition from RAW image to convert to sparse image, so we need to edit fstab
 infecho "Change fstab to avoid EFI partition"
