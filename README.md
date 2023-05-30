@@ -8,10 +8,11 @@
 This will generate bootimg and rootfs IMG files to flash it via fastboot
 
 Put your device in fastboot mode, and execute:
-   fastboot flash boot openSUSE-Tumbleweed-ARM-PHOSH-<device><variant>.aarch64.boot.img
+
+   * fastboot flash boot openSUSE-Tumbleweed-ARM-PHOSH-<device><variant>.aarch64.boot.img
    
-   fastboot -S 100M flash userdata openSUSE-Tumbleweed-ARM-PHOSH-<device>.aarch64.root.img
+   * fastboot -S 100M flash userdata openSUSE-Tumbleweed-ARM-PHOSH-<device>.aarch64.root.img
    
-   fastboot erase dtbo
+   * fastboot erase dtbo
    
 
