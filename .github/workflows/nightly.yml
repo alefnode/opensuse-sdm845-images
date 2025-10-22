@@ -72,8 +72,7 @@ jobs:
             "${{ env.ZIP_FILE }}" \
             --title "Nightly Build - ${{ env.DATE_TAG }}" \
             --notes "Automated nightly build for Oneplus 6/6t (enchilada & fajita) on ${{ env.DATE_TAG }}" \
-            --prerelease \
-            --clobber
+            --prerelease 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
