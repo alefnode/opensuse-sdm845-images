@@ -50,7 +50,7 @@ jobs:
 
       - name: Set date format (YYYY.MM.DD)
         id: date
-        run: echo "DATE_TAG=$(date +'%Y.%m.%d')" >> $GITHUB_ENV
+        run: echo "DATE_TAG=$(date +'%Y%m%d')" >> $GITHUB_ENV
 
       - name: Package generated files
         run: |
@@ -68,7 +68,7 @@ jobs:
 
       - name: Create new nightly release
         run: |
-          gh release create nightly \
+          gh release create nightly-v${{ env.DATE_TAG }} \
             "${{ env.ZIP_FILE }}" \
             --title "Nightly Build - ${{ env.DATE_TAG }}" \
             --notes "Automated nightly build for Oneplus 6/6t (enchilada & fajita) on ${{ env.DATE_TAG }}" \
