@@ -56,7 +56,7 @@ jobs:
         run: |
           ZIP_FILE="${{ env.BUILD_DIR }}/${{ env.ZIP_BASENAME }}_${{ env.DATE_TAG }}.zip"
           echo "📦 Empaquetando archivos en: $ZIP_FILE"
-          zip -r "$ZIP_FILE" ./*
+          zip -r "$ZIP_FILE" openSUSE*
           echo "ZIP_FILE=$ZIP_FILE" >> $GITHUB_ENV
 
       - name: Delete previous nightly release if exists
@@ -71,7 +71,7 @@ jobs:
           gh release create nightly \
             "${{ env.ZIP_FILE }}" \
             --title "Nightly Build - ${{ env.DATE_TAG }}" \
-            --notes "Automated nightly build executed from all.sh on ${{ env.DATE_TAG }}" \
+            --notes "Automated nightly build for Oneplus 6/6t (enchilada & fajita) on ${{ env.DATE_TAG }}" \
             --prerelease \
             --clobber
         env:
