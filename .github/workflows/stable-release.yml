@@ -4,15 +4,13 @@ on:
   push:
     tags:
       - 'v*'   # Solo tags que empiecen con "v"
-    branches:
-      - master
 
 permissions:
   contents: write
 
 env:
   BUILD_DIR: /tmp/build-results
-  ZIP_BASENAME: stable_build
+  ZIP_BASENAME: openSUSE-Tumbleweed-ARM-PHOSH-oneplus6
 
 jobs:
   build-and-release:
@@ -38,8 +36,12 @@ jobs:
         run: sudo bash all.sh
         shell: bash
 
-      - name: Set version from tag
-        run: echo "VERSION_TAG=${GITHUB_REF##*/}" >> $GITHUB_ENV
+      - name: Set date and version
+        run: |
+          DATE_TAG=$(date +'%Y%m%d')
+          VERSION_TAG=${GITHUB_REF##*/}
+          echo "DATE_TAG=$DATE_TAG" >> $GITHUB_ENV
+          echo "VERSION_TAG=$VERSION_TAG" >> $GITHUB_ENV
 
       - name: Package generated files
         run: |

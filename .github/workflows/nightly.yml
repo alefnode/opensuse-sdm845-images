@@ -10,7 +10,7 @@ permissions:
 
 env:
   BUILD_DIR: /tmp/build-results
-  ZIP_BASENAME: nightly_build
+  ZIP_BASENAME: openSUSE-Tumbleweed-ARM-PHOSH-oneplus6
 
 jobs:
   build-and-release:
@@ -54,7 +54,7 @@ jobs:
 
       - name: Package generated files
         run: |
-          ZIP_FILE="${{ env.BUILD_DIR }}/${{ env.ZIP_BASENAME }}_${{ env.DATE_TAG }}.zip"
+          ZIP_FILE="${{ env.BUILD_DIR }}/${{ env.ZIP_BASENAME }}_${{ env.DATE_TAG }}-nightly.zip"
           echo "📦 Empaquetando archivos en: $ZIP_FILE"
           zip -r "$ZIP_FILE" openSUSE*
           echo "ZIP_FILE=$ZIP_FILE" >> $GITHUB_ENV
