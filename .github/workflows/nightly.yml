@@ -1,0 +1,82 @@
+name: Nightly Build (all.sh)
+
+on:
+  schedule:
+    - cron: "0 21 * * *"  # Ejecuta a las 21:00 UTC cada noche
+  workflow_dispatch:        # Permite ejecución manual
+
+permissions:
+  contents: write
+
+env:
+  BUILD_DIR: /tmp/build-results
+  ZIP_BASENAME: nightly_build
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          echo "📦 Instalando dependencias necesarias..."
+          sudo apt-get update
+          sudo apt-get install -y \
+            zip \
+            abootimg \
+            android-sdk-libsparse-utils \
+            mkbootimg
+
+      - name: Verify installed tools
+        run: |
+          echo "🔧 Verificando herramientas..."
+          which losetup || echo "⚠️ losetup no encontrado"
+          which abootimg || echo "⚠️ abootimg no encontrado"
+          which mkbootimg || echo "⚠️ mkbootimg no encontrado"
+          which simg2img || echo "⚠️ simg2img no encontrado"
+          which img2simg || echo "⚠️ img2simg no encontrado"
+
+      - name: Prepare build directory
+        run: mkdir -p ${{ env.BUILD_DIR }}
+
+      - name: Run build script
+        run: |
+          echo "🚀 Ejecutando all.sh con privilegios de administrador..."
+          sudo bash all.sh
+        shell: bash
+
+      - name: Set date format (YYYY.MM.DD)
+        id: date
+        run: echo "DATE_TAG=$(date +'%Y.%m.%d')" >> $GITHUB_ENV
+
+      - name: Package generated files
+        run: |
+          ZIP_FILE="${{ env.BUILD_DIR }}/${{ env.ZIP_BASENAME }}_${{ env.DATE_TAG }}.zip"
+          echo "📦 Empaquetando archivos en: $ZIP_FILE"
+          zip -r "$ZIP_FILE" ./*
+          echo "ZIP_FILE=$ZIP_FILE" >> $GITHUB_ENV
+
+      - name: Delete previous nightly release if exists
+        run: |
+          gh release delete nightly --yes || true
+          git tag -d nightly || true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create new nightly release
+        run: |
+          gh release create nightly \
+            "${{ env.ZIP_FILE }}" \
+            --title "Nightly Build - ${{ env.DATE_TAG }}" \
+            --notes "Automated nightly build executed from all.sh on ${{ env.DATE_TAG }}" \
+            --prerelease \
+            --clobber
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Clean up
+        run: sudo rm -rf ${{ env.BUILD_DIR }}
+

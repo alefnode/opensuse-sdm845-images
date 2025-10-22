@@ -3,8 +3,13 @@ set -e
 
 source .env
 
-DEVICE=pocof1
-IMAGE=$(basename -s .raw.xz ${OPENSUSE_RAW_FILE})
+
+extension=$(basename $OPENSUSE_RAW_FILE | rev | cut -d'.' -f1 | rev)
+if [[ "$extension" == "xz" ]]; then
+    IMAGE=$(basename -s .raw.xz ${OPENSUSE_RAW_FILE})
+else
+    IMAGE=$(basename -s .raw ${OPENSUSE_RAW_FILE})
+fi
 
 # Functions
 infecho () {
