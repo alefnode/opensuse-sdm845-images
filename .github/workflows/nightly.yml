@@ -54,9 +54,9 @@ jobs:
 
       - name: Package generated files
         run: |
-          ZIP_FILE="${{ env.BUILD_DIR }}/${{ env.ZIP_BASENAME }}_${{ env.DATE_TAG }}-nightly.zip"
+          ZIP_FILE="${{ env.BUILD_DIR }}/${{ env.ZIP_BASENAME }}_${{ env.DATE_TAG }}-nightly.tar.zst"
           echo "📦 Empaquetando archivos en: $ZIP_FILE"
-          zip -9 -r "$ZIP_FILE" openSUSE*
+          tar -cf - openSUSE* | zstd -T0 -19 -o "${ZIP_FILE}"
           echo "ZIP_FILE=$ZIP_FILE" >> $GITHUB_ENV
 
       - name: Delete previous nightly release if exists
