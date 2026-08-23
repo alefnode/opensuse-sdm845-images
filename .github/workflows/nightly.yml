@@ -56,7 +56,7 @@ jobs:
         run: |
           ZIP_FILE="${{ env.BUILD_DIR }}/${{ env.ZIP_BASENAME }}_${{ env.DATE_TAG }}-nightly.zip"
           echo "📦 Empaquetando archivos en: $ZIP_FILE"
-          zip -r "$ZIP_FILE" openSUSE*
+          zip -9 -r "$ZIP_FILE" openSUSE*
           echo "ZIP_FILE=$ZIP_FILE" >> $GITHUB_ENV
 
       - name: Delete previous nightly release if exists
