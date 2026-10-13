@@ -34,6 +34,6 @@ bash extract-rootfs.sh
 
 infecho "Now you can install in your device"
 infecho "Put your device in fastboot mode, and execute:"
-infecho "  fastboot flash boot openSUSE-Tumbleweed-ARM-PHOSH-<device><variant>.aarch64.boot.img"
-infecho "  fastboot -S 100M flash userdata openSUSE-Tumbleweed-ARM-PHOSH-<device>.aarch64.root.img"
+infecho "  fastboot flash boot openSUSE-Tumbleweed-ARM-${DESKTOP}-<device><variant>.aarch64.boot.img"
+infecho "  fastboot -S 100M flash userdata openSUSE-Tumbleweed-ARM-${DESKTOP}-<device>.aarch64.root.img"
 infecho "  fastboot erase dtbo"

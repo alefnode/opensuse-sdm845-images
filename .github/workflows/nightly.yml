@@ -10,15 +10,26 @@ permissions:
 
 env:
   BUILD_DIR: /tmp/build-results
-  ZIP_BASENAME: openSUSE-Tumbleweed-ARM-PHOSH-oneplus6
 
 jobs:
-  build-and-release:
+  build:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        desktop: [PHOSH, PLAMO]
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Configure build (.env)
+        run: |
+          DEVICE=$(grep -m1 '^DEVICE=' .env | cut -d'"' -f2)
+          [ -n "$DEVICE" ] || { echo "❌ DEVICE not found in .env"; exit 1; }
+          sed -i "s/^DESKTOP=.*/DESKTOP=\"${{ matrix.desktop }}\"/" .env
+          echo "DEVICE=${DEVICE}" >> $GITHUB_ENV
+          echo "🎯 Building ${{ matrix.desktop }} image for ${DEVICE}"
 
       - name: Install dependencies
         run: |
@@ -54,28 +65,63 @@ jobs:
 
       - name: Package generated files
         run: |
-          ZIP_FILE="${{ env.BUILD_DIR }}/${{ env.ZIP_BASENAME }}_${{ env.DATE_TAG }}-nightly.zip"
+          ZIP_FILE="${{ env.BUILD_DIR }}/openSUSE-Tumbleweed-ARM-${{ matrix.desktop }}-${{ env.DEVICE }}_${{ env.DATE_TAG }}-nightly.zip"
           echo "📦 Empaquetando archivos en: $ZIP_FILE"
-          zip -r "$ZIP_FILE" openSUSE*
-          echo "ZIP_FILE=$ZIP_FILE" >> $GITHUB_ENV
+          shopt -s nullglob
+          FILES=(openSUSE*)
+          if [ ${#FILES[@]} -eq 0 ]; then
+            echo "❌ No se encontraron archivos que comiencen por 'openSUSE'"
+            exit 1
+          fi
+          zip -r "$ZIP_FILE" "${FILES[@]}"
+        shell: bash
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-${{ matrix.desktop }}
+          path: ${{ env.BUILD_DIR }}/*.zip
+          if-no-files-found: error
+
+      - name: Clean up
+        run: sudo rm -rf ${{ env.BUILD_DIR }}
+
+  release:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Set date format (YYYY.MM.DD)
+        id: date
+        run: echo "DATE_TAG=$(date +'%Y%m%d')" >> $GITHUB_ENV
+
+      - name: List artifacts
+        run: |
+          ls -la dist
+          FILES=(dist/*.zip)
+          echo "📦 Artifacts: ${#FILES[@]} zips"
 
       - name: Delete previous nightly release if exists
         run: |
-          gh release delete nightly --yes || true
-          git tag -d nightly || true
+          gh release delete nightly-v${{ env.DATE_TAG }} --yes || true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create new nightly release
         run: |
           gh release create nightly-v${{ env.DATE_TAG }} \
-            "${{ env.ZIP_FILE }}" \
+            dist/*.zip \
             --title "Nightly Build - ${{ env.DATE_TAG }}" \
-            --notes "Automated nightly build for Oneplus 6/6t (enchilada & fajita) on ${{ env.DATE_TAG }}" \
-            --prerelease 
+            --notes "Automated nightly PHOSH & PLAMO build for Oneplus 6/6t (enchilada & fajita) on ${{ env.DATE_TAG }}" \
+            --prerelease
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Clean up
-        run: sudo rm -rf ${{ env.BUILD_DIR }}
-
